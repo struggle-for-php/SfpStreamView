@@ -1,6 +1,6 @@
 <?php
 /**
- * post of parts is borrowed from spindle-view
+ * most of parts is borrowed from spindle-view
  * https://github.com/spindle/spindle-view
  *
  * spindle/view
@@ -15,13 +15,8 @@ use Phly\Http\Stream;
 
 class View implements \IteratorAggregate
 {
-    protected
-        /** @var ArrayObject */ $_storage
-    ,   /** @var string */ $_basePath
-    ,   /** @var string */ $_fileName
-    ,   /** @var string */ $_layoutFileName = ''
-    ;
-
+    protected $storage;
+    protected $basePath;
     protected $stack;
 
     /**
@@ -29,13 +24,12 @@ class View implements \IteratorAggregate
      * @param string $basePath テンプレートの探索基準パスです。相対パスも指定できます。指定しなければinclude_pathから探索します。
      * @param ArrayObject $arr
      */
-    function __construct($fileName, $basePath = '', ArrayObject $arr = null)
+    public function __construct($fileName, $basePath = '', ArrayObject $arr = null)
     {
-        $this->_storage = $arr ?: new ArrayObject(array(), ArrayObject::ARRAY_AS_PROPS);
-        //$this->_fileName = trim($fileName, \DIRECTORY_SEPARATOR);
+        $this->storage = $arr ?: new ArrayObject(array(), ArrayObject::ARRAY_AS_PROPS);
         $this->stack = new SplStack;
         $this->stack[] = trim($fileName, \DIRECTORY_SEPARATOR);
-        $this->_basePath = rtrim($basePath, \DIRECTORY_SEPARATOR);
+        $this->basePath = rtrim($basePath, \DIRECTORY_SEPARATOR);
     }
 
     /**
@@ -43,7 +37,7 @@ class View implements \IteratorAggregate
      */
     function getIterator()
     {
-        return $this->_storage->getIterator();
+        return $this->storage->getIterator();
     }
 
     /**
@@ -52,7 +46,7 @@ class View implements \IteratorAggregate
      */
     function __get($name)
     {
-        return $this->_storage[$name];
+        return $this->storage[$name];
     }
 
     /**
@@ -61,7 +55,7 @@ class View implements \IteratorAggregate
      */
     function __set($name, $value)
     {
-        $this->_storage[$name] = $value;
+        $this->storage[$name] = $value;
     }
 
     /**
@@ -70,7 +64,7 @@ class View implements \IteratorAggregate
      */
     function __isset($name)
     {
-        return isset($this->_storage[$name]);
+        return isset($this->storage[$name]);
     }
 
     /**
@@ -80,20 +74,20 @@ class View implements \IteratorAggregate
     function __toString()
     {
         $fileName = $this->stack->pop();
-        if ($this->_basePath) {
-            return $this->_basePath . \DIRECTORY_SEPARATOR . $fileName;
+        if ($this->basePath) {
+            return $this->basePath . \DIRECTORY_SEPARATOR . $fileName;
         } else {
             return (string)$fileName;
         }
     }
 
     /**
-     * セットされたview 変数を配列化して返します
+     * return assigned vars as array
      * @return array
      */
     function toArray()
     {
-        return (array)$this->_storage;
+        return (array)$this->storage;
     }
 
     /**
@@ -107,7 +101,7 @@ class View implements \IteratorAggregate
         }
 
         foreach ($array as $key => $value) {
-            $this->_storage[$key] = $value;
+            $this->storage[$key] = $value;
         }
     }
 
@@ -136,7 +130,7 @@ class View implements \IteratorAggregate
      */
     private function _merge($name, array $array, $append=true)
     {
-        $s = $this->_storage;
+        $s = $this->storage;
         if (isset($s[$name])) {
             if ($append) {
                 $s[$name] = array_merge((array)$s[$name], $array);
@@ -149,13 +143,10 @@ class View implements \IteratorAggregate
     }
 
     /**
-     * テンプレートファイルを描画してstream にwrite
-     * @return StreamableInterface
      */
     function render($fp)
     {
-
-        foreach ($this->_storage as ${"\x00key"} => ${"\x00val"}) {
+        foreach ($this->storage as ${"\x00key"} => ${"\x00val"}) {
             $${"\x00key"} = ${"\x00val"};
         }
 
@@ -174,13 +165,10 @@ class View implements \IteratorAggregate
     }
 
     /**
-     * 親となるレイアウトテンプレートのファイル名を指定します。
-     * レイアウトは__construct()で指定した基準パスと同じパスから探索します。
      * @param string $layoutFileName
      */
     function stackLayout($layoutFileName)
     {
-        //$this->_layoutFileName = $layoutFileName;
         $this->stack[] = $layoutFileName;
     }
 
