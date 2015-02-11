@@ -142,6 +142,13 @@ class View implements \IteratorAggregate
         }
     }
 
+    private $fp;
+
+    public function write($string)
+    {
+        return fwrite($this->fp, $string);
+    }
+
     /**
      */
     function render($fp)
@@ -150,11 +157,10 @@ class View implements \IteratorAggregate
             $${"\x00key"} = ${"\x00val"};
         }
 
-        ob_start(function($buffer) use (&$fp) {
-            fwrite($fp, $buffer);
-        }, 1024 * 1024);
+        $this->fp = $fp;
         include (string)$this;
-        ob_end_flush();
+        $fp = $this->fp;
+        unset($this->fp);
 
         return $fp;
     }
