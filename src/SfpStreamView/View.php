@@ -17,9 +17,6 @@ class View implements \IteratorAggregate
     protected $baseDir;
     protected $stack;
 
-    /**
-     * @param string $baseDir テンプレートの探索基準パスです。相対パスも指定できます。指定しなければinclude_pathから探索します。
-     */
     public function __construct($baseDir = '', ArrayObject $vars = null)
     {
         $this->storage = $vars ?: new ArrayObject(array(), ArrayObject::ARRAY_AS_PROPS);
@@ -160,7 +157,7 @@ class View implements \IteratorAggregate
         return $fp;
     }
 
-    function content()
+    public function content()
     {
         return $this->stack->pop();
     }
@@ -168,7 +165,7 @@ class View implements \IteratorAggregate
     /**
      * @param string $layoutFileName
      */
-    function stackLayout($layoutFileName)
+    public function stackLayout($layoutFileName)
     {
         $this->stack[] = $layoutFileName;
     }
