@@ -1,7 +1,8 @@
 {
     "name": "struggle-for-php/sfp-stream-view",
-    "description": "re-register https stream wrapper",
+    "description": "`View` component working with stream & output buffer for low memory usage",
     "license": "BSD-3-Clause",
+    "keywords": ["view"],
     "authors": [
         {
             "name": "sasezaki",
