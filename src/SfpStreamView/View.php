@@ -152,7 +152,8 @@ class View implements \IteratorAggregate
 
         ob_start(function($buffer) use (&$fp) {
             fwrite($fp, $buffer);
-        }, 1024 * 1024);
+        });
+        ob_implicit_flush(false);
         include (string)$this;
         ob_end_flush();
 
