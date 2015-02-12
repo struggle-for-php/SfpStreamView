@@ -8,8 +8,6 @@ namespace SfpStreamView;
 
 use ArrayObject;
 use SplStack;
-use Psr\Http\Message\StreamableInterface;
-use Phly\Http\Stream;
 
 class View implements \IteratorAggregate
 {
