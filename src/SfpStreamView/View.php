@@ -2,9 +2,7 @@
 /**
  * most of parts is borrowed from spindle-view
  * https://github.com/spindle/spindle-view
- *
- * spindle/view
- * @license CC0-1.0 (Public Domain)
+ * spindle/view is licensed under CC0-1.0 (Public Domain)
  */
 namespace SfpStreamView;
 
@@ -16,20 +14,17 @@ use Phly\Http\Stream;
 class View implements \IteratorAggregate
 {
     protected $storage;
-    protected $basePath;
+    protected $baseDir;
     protected $stack;
 
     /**
-     * @param string $fileName 描画したいテンプレートのファイル名を指定します
-     * @param string $basePath テンプレートの探索基準パスです。相対パスも指定できます。指定しなければinclude_pathから探索します。
-     * @param ArrayObject $arr
+     * @param string $baseDir テンプレートの探索基準パスです。相対パスも指定できます。指定しなければinclude_pathから探索します。
      */
-    public function __construct($fileName, $basePath = '', ArrayObject $arr = null)
+    public function __construct($baseDir = '', ArrayObject $vars = null)
     {
-        $this->storage = $arr ?: new ArrayObject(array(), ArrayObject::ARRAY_AS_PROPS);
+        $this->storage = $vars ?: new ArrayObject(array(), ArrayObject::ARRAY_AS_PROPS);
         $this->stack = new SplStack;
-        $this->stack[] = trim($fileName, \DIRECTORY_SEPARATOR);
-        $this->basePath = rtrim($basePath, \DIRECTORY_SEPARATOR);
+        $this->baseDir = rtrim($baseDir, \DIRECTORY_SEPARATOR);
     }
 
     /**
@@ -74,8 +69,8 @@ class View implements \IteratorAggregate
     function __toString()
     {
         $fileName = $this->stack->pop();
-        if ($this->basePath) {
-            return $this->basePath . \DIRECTORY_SEPARATOR . $fileName;
+        if ($this->baseDir) {
+            return $this->baseDir . \DIRECTORY_SEPARATOR . $fileName;
         } else {
             return (string)$fileName;
         }
@@ -142,10 +137,13 @@ class View implements \IteratorAggregate
         }
     }
 
-    /**
-     */
-    function render($fp)
+    public function render($template, $fp = null)
     {
+        $fp = ($fp) ?: fopen('php://memory', 'wb+');
+
+        $originStack = clone $this->stack;
+        $this->stack->unshift(ltrim($template, \DIRECTORY_SEPARATOR));
+
         foreach ($this->storage as ${"\x00key"} => ${"\x00val"}) {
             $${"\x00key"} = ${"\x00val"};
         }
@@ -156,6 +154,8 @@ class View implements \IteratorAggregate
         ob_implicit_flush(false);
         include (string)$this;
         ob_end_flush();
+
+        $this->stack = $originStack;
 
         return $fp;
     }
@@ -172,5 +172,4 @@ class View implements \IteratorAggregate
     {
         $this->stack[] = $layoutFileName;
     }
-
 }
