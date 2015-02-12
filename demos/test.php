@@ -1,4 +1,6 @@
 <?php
+//usage
+//$php -d memory_limit=6M demos/test.php
 require_once __DIR__.'/../vendor/autoload.php';
 
 $view = new SfpStreamView\View('template.phtml', __DIR__);
