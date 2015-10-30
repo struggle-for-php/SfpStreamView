@@ -1,0 +1,12 @@
+<phpunit bootstrap="./tests/Bootstrap.php" colors="true">
+    
+    <testsuite name="SfpStreamView Test Suite">
+     <directory>./tests/</directory>
+    </testsuite>
+
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src</directory>
+        </whitelist>
+    </filter>
+</phpunit>

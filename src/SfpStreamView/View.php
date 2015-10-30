@@ -25,7 +25,7 @@ class View implements \IteratorAggregate
     /**
      * @return \ArrayIterator
      */
-    function getIterator()
+    public function getIterator()
     {
         return $this->storage->getIterator();
     }
@@ -34,7 +34,7 @@ class View implements \IteratorAggregate
      * @param string|int $name
      * @return mixed
      */
-    function __get($name)
+    public function __get($name)
     {
         return $this->storage[$name];
     }
@@ -58,10 +58,11 @@ class View implements \IteratorAggregate
     }
 
     /**
-     * 描画するスクリプトファイルのパスを返します。
+     * Get script file path
+     *
      * @return string
      */
-    function __toString()
+    function getScriptPath()
     {
         $fileName = $this->stack->pop();
         if ($this->baseDir) {
@@ -81,7 +82,7 @@ class View implements \IteratorAggregate
     }
 
     /**
-     * 配列で一気にview変数をセットします
+     * assign view vars
      * @param array|\Traversable $array
      */
     function assign($array)
@@ -147,7 +148,7 @@ class View implements \IteratorAggregate
             fwrite($fp, $buffer);
         });
         ob_implicit_flush(false);
-        include (string)$this;
+        include $this->getScriptPath();
         ob_end_flush();
 
         $this->stack = $originStack;
