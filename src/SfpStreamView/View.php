@@ -8,6 +8,7 @@ namespace SfpStreamView;
 
 use ArrayObject;
 use SplStack;
+use Psr\Http\Message\ResponseInterface as Response;
 
 class View implements \IteratorAggregate
 {
@@ -154,6 +155,29 @@ class View implements \IteratorAggregate
         $this->stack = $originStack;
 
         return $fp;
+    }
+
+    public function renderResponse($template, Response $response)
+    {
+
+        $originStack = clone $this->stack;
+        $this->stack->unshift(ltrim($template, \DIRECTORY_SEPARATOR));
+
+        foreach ($this->storage as ${"\x00key"} => ${"\x00val"}) {
+            $${"\x00key"} = ${"\x00val"};
+        }
+
+        $body = $response->getBody();
+        ob_start(function($buffer) use ($body) {
+            $body->write($buffer);
+        });
+        ob_implicit_flush(false);
+        include $this->getScriptPath();
+        ob_end_flush();
+
+        $this->stack = $originStack;
+
+        return $response;
     }
 
     public function content()
